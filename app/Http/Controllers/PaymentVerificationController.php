@@ -28,6 +28,9 @@ class PaymentVerificationController extends Controller
         $khalti_params_mobile = $khalti['mobile'];
         $khalti_params_pre_token = $khalti['token'];
 
+        $timeStamp=time();
+
+
         foreach ($cart as $temp) {
 
             $cart_book_id = $temp['bookId'];
@@ -107,6 +110,7 @@ class PaymentVerificationController extends Controller
                             $Order->book_id = $temp['bookId'];
                             $Order->trans_idx = $khalti_params_pre_token;
                             $Order->price = $temp['bookPrice'];
+                            $Order->custom_order_id=$timeStamp;
                             $Order->line_total = $temp['bookLineTotal'];
                             $Order->quantity = $temp['bookQuantity'];
                             $Order->save();
@@ -141,6 +145,8 @@ class PaymentVerificationController extends Controller
         $esewa_params_oid = implode("-", $esewa_params_oid);
         $esewa_params_amt = $esewa['amt'];
         $esewa_params_refId = $esewa['refId'];
+
+        $timeStamp=time();
 
         // print_r($esewa_params_oid);
 
@@ -203,9 +209,13 @@ class PaymentVerificationController extends Controller
 
                 if ('SUCCESS' == $verification_response) {
                     // echo '<h2><strong>SUCCESS:</strong> Transaction is successful !!!</h2>';
+
                     // find the row of previously inserted data for update
+
                     $EsewaUpdate = Esewa::find($insertID);
                     $EsewaUpdate->status = 1;
+
+
                     $EsewaUpdate->save();
                     if ($EsewaUpdate) {
                         foreach ($cart as $temp) {
@@ -214,6 +224,7 @@ class PaymentVerificationController extends Controller
                             $Order->book_id = $temp['bookId'];
                             $Order->trans_idx = $esewa_params_refId;
                             $Order->price = $temp['bookPrice'];
+                            $Order->custom_order_id=$timeStamp;
                             $Order->line_total = $temp['bookLineTotal'];
                             $Order->quantity = $temp['bookQuantity'];
                             $Order->save();

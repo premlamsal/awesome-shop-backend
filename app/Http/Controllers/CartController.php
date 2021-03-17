@@ -19,8 +19,12 @@ class CartController extends Controller
             $cart_book_quantity = $temp['bookQuantity'];
 
             $book = Book::where('id', $cart_book_id);
-
-            $this->books_id = $this->books_id."-".time()."-".$book->value('id');//concat 
+            
+            if($this->books_id=="ES"){
+                $this->books_id = $this->books_id."-".time()."-".$book->value('id');//concat 
+            }else{
+                $this->books_id = $this->books_id."-".$book->value('id');//concat 
+            }
 
             $book_price = $book->value('price');
             $book_discount = $book->value('discount');
