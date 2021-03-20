@@ -20,6 +20,10 @@ Route::get('/', function () {
 Auth::routes(['register'=>false]);
 
 
+Route::get('verify/esewa','PaymentVerificationController@verifyEsewaWeb');
+
+
+
 
 
 

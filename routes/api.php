@@ -92,6 +92,10 @@ Route::group(['prefix'=>'frontend','as'=>'frontend.'], function(){
 
 				Route::post('review','Api\ReviewController@store');
 
+				Route::get('getMyOrders','Api\OrderController@myOrders');
+
+				Route::get('getOrder/{id}','Api\OrderController@show');
+
 				Route::post('cart/check','CartController@check');
 
 				Route::post('verify/esewa','PaymentVerificationController@verifyEsewa');

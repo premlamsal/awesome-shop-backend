@@ -17,11 +17,8 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->string('custom_order_id');
             $table->text('trans_idx');
-            $table->string('price');
-            $table->string('quantity');
-            $table->string('line_total');
-            $table->unsignedBigInteger('book_id');
-            $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
+            $table->json('order_json');
+            $table->string('status');//pending seenbyowner on the way delivered received
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

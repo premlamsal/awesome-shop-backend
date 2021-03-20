@@ -104,17 +104,14 @@ class PaymentVerificationController extends Controller
 
                         // inserting into the mybook table for the purchased entry for book
 
-                        foreach ($cart as $temp) {
                             $Order = new Order;
                             $Order->user_id = Auth::user()->id;
-                            $Order->book_id = $temp['bookId'];
                             $Order->trans_idx = $khalti_params_pre_token;
-                            $Order->price = $temp['bookPrice'];
                             $Order->custom_order_id=$timeStamp;
-                            $Order->line_total = $temp['bookLineTotal'];
-                            $Order->quantity = $temp['bookQuantity'];
+                            $Order->status='pending';
+                            $Order->order_json=json_encode($cart);
                             $Order->save();
-                        }
+                    
                         if ($Order) {
                             return response()->json(['msg' => "You have successfuly bought book"], 200);
                         }
@@ -156,12 +153,12 @@ class PaymentVerificationController extends Controller
             $cart_book_quantity = $temp['bookQuantity'];
 
             $book = Book::where('id', $cart_book_id);
-            $book_price = $book->value('price');
-            $book_discount = $book->value('discount');
+            $book_price = floatval($book->value('price'));
+            $book_discount = floatval($book->value('discount'));
             // $book_quantity = $book->value('quantity');
-            $book_net_price = $book_price - $book_discount;
-            $line_total = $cart_book_quantity * $book_net_price;
-            $this->grand_total = $this->grand_total + $line_total;
+            $book_net_price = floatval($book_price - $book_discount);
+            $line_total = floatval($cart_book_quantity * $book_net_price);
+            $this->grand_total = floatval($this->grand_total + $line_total);
             if ($this->books_id == "") {
                 $this->books_id = $book->value('id');
             } else {
@@ -218,17 +215,14 @@ class PaymentVerificationController extends Controller
 
                     $EsewaUpdate->save();
                     if ($EsewaUpdate) {
-                        foreach ($cart as $temp) {
+                       
                             $Order = new Order;
                             $Order->user_id = Auth::user()->id;
-                            $Order->book_id = $temp['bookId'];
                             $Order->trans_idx = $esewa_params_refId;
-                            $Order->price = $temp['bookPrice'];
                             $Order->custom_order_id=$timeStamp;
-                            $Order->line_total = $temp['bookLineTotal'];
-                            $Order->quantity = $temp['bookQuantity'];
+                            $Order->status='pending';
+                            $Order->order_json=json_encode($cart);
                             $Order->save();
-                        }
                         if ($Order) {
 
                             //do after book purchase
@@ -252,5 +246,125 @@ class PaymentVerificationController extends Controller
             return response(['msg' => 'Error while verifying payment. Contact web admin for more #err30001'], 503);
         }
         // return response(['esewa'=>$esewa->oid],200);
+    }
+
+    public function verifyEsewaWeb(Request $request)
+    {
+
+        $esewa['oid']=$request->query('oid');
+        $esewa['amt']=$request->query('amt');
+        $esewa['refId']=$request->query('refId');
+
+
+        // echo $esewa['oid'];
+
+        // $esewa_params_oid = explode("-", $esewa['oid']); //will split string to array by "-"
+        // $esewa_params_oid = array_slice($esewa_params_oid, 2); //will igonore array from 2
+        // $esewa_params_oid = implode("-", $esewa_params_oid);
+        // $esewa_params_amt = $esewa['amt'];
+        // $esewa_params_refId = $esewa['refId'];
+
+        // $timeStamp=time();
+
+        // // print_r($esewa_params_oid);
+
+        // foreach ($cart as $temp) {
+
+        //     $cart_book_id = $temp['bookId'];
+        //     $cart_book_quantity = $temp['bookQuantity'];
+
+        //     $book = Book::where('id', $cart_book_id);
+        //     $book_price = floatval($book->value('price'));
+        //     $book_discount = floatval($book->value('discount'));
+        //     // $book_quantity = $book->value('quantity');
+        //     $book_net_price = floatval($book_price - $book_discount);
+        //     $line_total = floatval($cart_book_quantity * $book_net_price);
+        //     $this->grand_total = floatval($this->grand_total + $line_total);
+        //     if ($this->books_id == "") {
+        //         $this->books_id = $book->value('id');
+        //     } else {
+        //         $this->books_id = $this->books_id . "-" . $book->value('id'); //concat 
+        //     }
+        // } //end of for each
+
+        // if ($this->grand_total == $esewa_params_amt && $this->books_id == $esewa_params_oid) {
+
+
+        //     //before verification for reference purposes
+        //     $Esewa = new Esewa;
+        //     $Esewa->user_id = Auth::user()->id;
+        //     $Esewa->amt = $esewa_params_amt;
+        //     $Esewa->refId = $esewa_params_refId;
+        //     $Esewa->oid = $esewa['oid'];
+        //     $Esewa->status = 0; //will set to 1 if the transaction verified
+        //     $Esewa->save();
+
+        //     if ($Esewa) {
+
+        //         $insertID = $Esewa->id; //picking the inserted data id for updating row later on after verification process
+
+        //         //verification process starts
+        //         $url = env('ESEWA_VERIFY_URL', '');
+        //         $data = [
+        //             'amt' => $esewa_params_amt,
+        //             'rid' => $esewa_params_refId,
+        //             'pid' => $esewa['oid'], //now already compared oid and pid now sending pid with timestamp
+        //             'scd' => env('ESEWA_MERCHANT', 'EPAYTEST')
+        //         ];
+
+        //         $curl = curl_init($url);
+        //         curl_setopt($curl, CURLOPT_POST, true);
+        //         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        //         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        //         $response = curl_exec($curl);
+        //         curl_close($curl);
+
+        //         $insertID = $Esewa->id; //picking the inserted data id for updating row later on after verification process
+
+        //         $verification_response  = strtoupper(trim(strip_tags($response)));
+        //         // print_r($data);
+        //         // return response($verification_response);
+
+        //         if ('SUCCESS' == $verification_response) {
+        //             // echo '<h2><strong>SUCCESS:</strong> Transaction is successful !!!</h2>';
+
+        //             // find the row of previously inserted data for update
+
+        //             $EsewaUpdate = Esewa::find($insertID);
+        //             $EsewaUpdate->status = 1;
+
+
+        //             $EsewaUpdate->save();
+        //             if ($EsewaUpdate) {
+                       
+        //                     $Order = new Order;
+        //                     $Order->user_id = Auth::user()->id;
+        //                     $Order->trans_idx = $esewa_params_refId;
+        //                     $Order->custom_order_id=$timeStamp;
+        //                     $Order->order_json=json_encode($cart);
+        //                     $Order->save();
+        //                 if ($Order) {
+
+        //                     //do after book purchase
+        //                     return response(['msg' => 'You bought book successfully', 'status' => 'success'], 200);
+        //                 } else {
+        //                     return response(['msg' => 'Error While Adding Book.Contact admin for more information.'], 503);
+        //                 }
+        //             } else {
+        //                 return response(['msg' => 'Error While Updating Status of Book.Contact admin for more information..'], 503);
+        //             }
+        //         } elseif ('FAILURE' == $verification_response) {
+
+        //             return response(['msg' => 'failed while verification.'], 503);
+        //         } else {
+        //             return response(['msg' => 'No response from the verification server i.e ESEWA server might be offline or blocked the request.'], 503);
+        //         }
+        //     }
+        //     //    return response(['msg'=>'Successfully verified payment'],201);
+
+        // } else {
+        //     return response(['msg' => 'Error while verifying payment. Contact web admin for more #err30001'], 503);
+        // }
+        // // return response(['esewa'=>$esewa->oid],200);
     }
 }

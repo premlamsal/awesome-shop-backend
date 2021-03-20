@@ -26,20 +26,21 @@ class CartController extends Controller
                 $this->books_id = $this->books_id."-".$book->value('id');//concat 
             }
 
-            $book_price = $book->value('price');
+            $book_price = floatval($book->value('price'));
             $book_discount = $book->value('discount');
-            $book_quantity = $book->value('quantity');
+            $book_quantity = floatval($book->value('quantity')) ;
             $book_net_price = $book_price - $book_discount;
 
             if ($book_quantity >= $cart_book_quantity) {
 
-                $line_total = $cart_book_quantity * $book_net_price;
+                $line_total = floatval($cart_book_quantity * $book_net_price);
 
             } else {
 
                 //cart quanity is higher than quantity in stock
+                return response(['msg'=>'error'],503);
             }
-            $this->grand_total = $this->grand_total + $line_total;
+            $this->grand_total =floatval($this->grand_total + $line_total);
         }
 
         // $temp_books_id=explode("-",$this->books_id);
