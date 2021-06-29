@@ -21,13 +21,13 @@ class ReviewController extends Controller
 
     		'rating'=> 'required|numeric',
 
-    		'product_id'=>'required|numeric',
+    		'book_id'=>'required|numeric',
 
     	]);
 
     	$user_id=Auth::user()->id;
 
-    	$product=Book::findOrFail($request->product_id);//find the product 
+    	$product=Book::findOrFail($request->book_id);//find the product 
 
     	$review=new Review();//create review object 
 
@@ -39,7 +39,7 @@ class ReviewController extends Controller
     	
     	$review->user_id=$user_id;
 
-    	$review->product_id=$request->product_id;
+    	$review->book_id=$request->book_id;
 
     	if($product->reviews()->save($review)){
 

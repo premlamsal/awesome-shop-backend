@@ -93,8 +93,19 @@ Route::group(['prefix'=>'frontend','as'=>'frontend.'], function(){
 				Route::post('review','Api\ReviewController@store');
 
 				Route::get('getMyOrders','Api\OrderController@myOrders');
+				//first hit this before paymnet success
+				Route::post('create-order','Api\OrderController@createOrder');
+				//hit this after payment is success
+				Route::post('update-order','Api\OrderController@updateOrder');
+
+				Route::get('getOrders','Api\OrderController@orders');
+				
+				
+
+				Route::get('getSellerOrder/{id}','Api\OrderController@getSellerOrder');
 
 				Route::get('getOrder/{id}','Api\OrderController@show');
+
 
 				Route::post('cart/check','CartController@check');
 

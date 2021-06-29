@@ -22,4 +22,9 @@ class Book extends Model
         return $this->belongsTo(Unit::class);
     }
 
+    public function orderDetails(){
+
+        return $this->hasMany(OrderDetails::class);
+    }
+
 }

@@ -15,9 +15,8 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('custom_order_id');
-            $table->text('trans_idx');
-            $table->json('order_json');
+            $table->string('grand_total')->default(0);
+            $table->text('trans_idx')->nullable();
             $table->string('status');//pending seenbyowner on the way delivered received
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
