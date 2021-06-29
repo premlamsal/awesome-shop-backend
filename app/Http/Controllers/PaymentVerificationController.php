@@ -182,13 +182,13 @@ class PaymentVerificationController extends Controller
                         $order_db->status = 'pending';
                         if ($order_db->save()) {
 
-                            return response(['msg' => 'You bought book successfully', 'status' => 'success'], 200);
+                            return response(['msg' => 'Your order created successfully', 'status' => 'success'], 200);
 
                         } else {
-                            return response(['msg' => 'Error While Adding Book.Contact admin for more information.'], 503);
+                            return response(['msg' => 'Error While creating order.Contact admin for more information.'], 503);
                         }
                     } else {
-                        return response(['msg' => 'Error While Updating Status of Book.Contact admin for more information..'], 503);
+                        return response(['msg' => 'Error While Updating Status of order.Contact admin for more information..'], 503);
                     }
                 } elseif ('FAILURE' == $verification_response) {
 
